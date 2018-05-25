@@ -1,18 +1,14 @@
 import React, { Component } from 'react';
 import IceContainer from '@icedesign/container';
-import { Search, Grid } from '@icedesign/base';
+import { Search, Grid, Tab } from '@icedesign/base';
 import './FilterWithSearch.scss';
 import moment from 'moment';
-import { DatePicker, Input, Select, Button  } from "@icedesign/base";
+import { DatePicker, Input, Select, Button, Feedback } from '@icedesign/base';
+import NebUtils from '../../../../util/NebUtils.js';
+import { Base64 } from 'js-base64';
 
-const { MonthPicker, YearPicker, RangePicker } = DatePicker;
+const Toast = Feedback.toast;
 const { Row, Col } = Grid;
-
-const dataSource = [
-  {label:'option1', value:'option1'},
-  {label:'option2', value:'option2'},
-  {label:'disabled', disabled:true}
-];
 
 export default class FilterWithSearch extends Component {
   static displayName = 'FilterWithSearch';
@@ -25,24 +21,97 @@ export default class FilterWithSearch extends Component {
     super(props);
     this.state = {
       inputDate: null,
-      inputAddr: null,
+      pageTitle: null,
+      dataSource: [],
     };
+  }
+
+  componentDidMount() {
+    this.doUpdateTable('19960717');
   }
 
   onSearchDate() {
     if (this.state.inputDate) {
-      const str = moment(this.state.inputDate).format("YYYYMMDD");
-      console.log(str);
+      const str = moment(this.state.inputDate)
+        .format('YYYYMMDD');
+      this.doUpdateTable(str);
     }
   }
 
-  onSearchAddr() {
-    if (this.state.inputAddr) {
-      const str = this.state.inputAddr;
-      console.log(str);
+  doUpdateTable = (day) => {
+    if (!NebUtils.checkInstalledPlugin()) {
+      Toast.error('还未安装Chrome扩展，请点击页面上方的下载按钮！');
+      return;
+    }
+    const contract = {
+      function: 'querySameDay',
+      args: `[${day}]`,
+    };
+    Toast.success('查询中，请稍等...');
+    NebUtils.pluginSimCall(
+      contract.function,
+      contract.args,
+      (err) => {
+        Toast.error('获取数据失败: ' + err);
+      },
+      (item) => {
+        console.log(item);
+        this.setState({
+          pageTitle: `星链缘人-${day}（${item.length}个）`,
+          dataSource: item,
+        });
+        Toast.success('获取数据成功！');
+      },
+    );
+  };
+
+  renderItem = (item, idx) => {
+    return (
+      <div style={styles.item} key={idx}>
+        <ul>
+          <li style={styles.detailItem}>
+            <div style={styles.detailTitle}>生日：</div>
+            <div style={styles.detailBody}>{item.gender === 'man' ? '男' : '女'}</div>
+          </li>
+          <li style={styles.detailItem}>
+            <div style={styles.detailTitle}>生日：</div>
+            <div style={styles.detailBody}>{item.birthDate}</div>
+          </li>
+          <li style={styles.detailItem}>
+            <div style={styles.detailTitle}>NAS地址：</div>
+            <div style={styles.detailBody}>{item.from}</div>
+          </li>
+          <li style={styles.detailItem}>
+            <div style={styles.detailTitle}>上传时间：</div>
+            <div style={styles.detailBody}>{new Date(item.time).toLocaleString()}</div>
+          </li>
+          <li style={styles.detailItem}>
+            <div style={styles.detailTitle}>想说的话：</div>
+            <div style={styles.detailBody}>{Base64.decode(item.comment)}</div>
+          </li>
+        </ul>
+      </div>
+    );
+  };
+
+  renderResult = () => {
+    if (this.state.pageTitle) {
+      return (
+        <IceContainer>
+          <div>
+            <h2 style={styles.title}>{this.state.pageTitle}</h2>
+            <div style={styles.noticeList}>
+              {this.state.dataSource.length === 0 ? '暂无数据' :
+                this.state.dataSource.map((item, idx) => {
+                  return this.renderItem(item, idx);
+                })}
+            </div>
+          </div>
+        </IceContainer>
+      );
     }
   }
-
+  ;
 
   render() {
     return (
@@ -57,33 +126,21 @@ export default class FilterWithSearch extends Component {
               查找同年同月同日生：
             </Col>
             <Col s="12" l="10">
-              <DatePicker onChange={(val, str) => {
-                this.setState({
-                  inputDate: val
-                })
-              }} />
+              <DatePicker
+                defaultValue={'1996年07月17日'}
+                formater={['YYYY年MM月DD日']}
+                onChange={(val, str) => {
+                  this.setState({
+                    inputDate: val,
+                  });
+                }}/>
               &nbsp;&nbsp;&nbsp;
               <Button type="primary" size="small" onClick={this.onSearchDate.bind(this)}>查找</Button>
             </Col>
           </Row>
-
-
-          <Row style={styles.row}>
-            <Col xxs="8" s="5" l="5" style={styles.formLabel}>
-              查找情侣地址：
-            </Col>
-            <Col s="12" l="10">
-              <Input placeholder="输入星云主网钱包地址" onChange={(val, str) => {
-                this.setState({
-                  inputAddr: val
-                })
-              }} />
-              &nbsp;&nbsp;&nbsp;
-              <Button type="primary" size="small" onClick={this.onSearchAddr.bind(this)}>查找</Button>
-            </Col>
-          </Row>
-
         </IceContainer>
+
+        {this.renderResult()}
       </div>
     );
   }
@@ -94,23 +151,41 @@ const styles = {
     alignItems: 'center',
     paddingBottom: '10px',
   },
-  filterContainer: {
-    lineHeight: '32px',
-  },
-  filterItem: {
-    height: '20px',
-    padding: '0 20px',
-    color: '#333',
-    fontSize: '14px',
-    cursor: 'pointer',
-    borderRight: '1px solid #D8D8D8',
-  },
-  searchWrapper: {
-    textAlign: 'right',
-    margin: '10px 0',
-  },
   formLabel: {
     textAlign: 'right',
     width: '100%',
   },
+
+  ///////////////////////////////
+
+  item: {
+    borderBottom: '3px solid #E5E5E5',
+    padding: '15px 0',
+  },
+  title: {
+    fontSize: '16px',
+    fontWeight: '900',
+    color: '#666',
+  },
+  date: {
+    fontSize: '12px',
+    color: '#666',
+  },
+
+
+  detailItem: {
+    padding: '8px 0px',
+    display: 'flex',
+    borderTop: '1px solid #EEEFF3',
+  },
+  detailTitle: {
+    marginRight: '30px',
+    textAlign: 'right',
+    width: '120px',
+    color: '#999999',
+  },
+  detailBody: {
+    flex: 1,
+  },
+
 };

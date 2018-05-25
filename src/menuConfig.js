@@ -43,7 +43,7 @@ const asideMenuConfig = [
     icon: 'fans',
   },
   {
-    name: '我的',
+    name: '提交',
     path: '/Create',
     icon: 'yonghu',
   },
