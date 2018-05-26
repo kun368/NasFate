@@ -6,21 +6,27 @@ const { Row, Col } = Grid;
 const abilities = [
   {
     icon: 'https://gw.alicdn.com/tfs/TB1BY1osGmWBuNjy1XaXXXCbXXa-320-316.png',
-    title: '框架',
-    content: '熟悉的社区开发模式，彻底的组件化能力',
-    link: '/framework/',
+    title: '社交',
+    content: '留下你的生日和留言，让别人找到同日生的你！',
+    link: 'https://www.zhihu.com/question/31153364',
   },
   {
     icon: 'https://gw.alicdn.com/tfs/TB1AY1osGmWBuNjy1XaXXXCbXXa-320-316.png',
-    title: '组件',
-    content: '为开发者提供了一系列基础组件，通过组件组合进行高效开发',
-    link: '/components/',
+    title: '愿望',
+    content: '许下生日愿望，与有缘人一起过生日',
+    link: '/#/Create/',
   },
   {
     icon: 'https://gw.alicdn.com/tfs/TB1uzsTsv9TBuNjy0FcXXbeiFXa-320-316.png',
-    title: 'API',
-    content: '手机淘宝能力支持和保障',
-    link: '/api/',
+    title: '历史',
+    content: '在星链缘上查看生日那天的历史大事',
+    link: '/',
+  },
+  {
+    icon: 'https://gw.alicdn.com/tfs/TB1BY1osGmWBuNjy1XaXXXCbXXa-320-316.png',
+    title: '安全',
+    content: '基于星云智能合约，永不丢失，不可篡改！',
+    link: 'https://nebulas.io/',
   },
 ];
 
@@ -28,7 +34,7 @@ export default class AbilityIntroduction extends Component {
   renderAblities(abilities) {
     return abilities.map(({ icon, title, content, link }, idx) => {
       return (
-        <Col xxs="24" l="8" style={styles.item} key={idx}>
+        <Col xxs="24" l="6" style={styles.item} key={idx}>
           <img src={icon} style={{ width: '160px', height: '160px' }} />
           <div style={{ fontSize: '24px', color: '#333', marginBottom: '6px' }}>
             {title}
@@ -60,7 +66,6 @@ export default class AbilityIntroduction extends Component {
             >
               <div
                 style={{
-                  marginLeft: '5px',
                   display: 'inline-block',
                   marginLeft: '-3.53553px', // -10 * sqrt(2) / 4
                   width: '10px',
@@ -79,7 +84,7 @@ export default class AbilityIntroduction extends Component {
   render() {
     return (
       <div style={styles.container}>
-        <div style={styles.title}>我们的能力</div>
+        <div style={styles.title}>我们的特色</div>
         <div style={styles.subtitle}>&lt; Distinguishing Feature &gt;</div>
         <Row wrap style={styles.group}>
           {this.renderAblities(abilities)}
@@ -92,7 +97,7 @@ export default class AbilityIntroduction extends Component {
 const styles = {
   container: {
     background: '#fafafa',
-    padding: '70px 70px 140px',
+    padding: '0px 70px 50px',
     textAlign: 'center',
   },
   title: {

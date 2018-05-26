@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button } from '@icedesign/base';
+import { Button, Icon } from '@icedesign/base';
 import './ExcellentHomePage.scss';
 
 export default class ExcellentHomePage extends Component {
@@ -26,15 +26,17 @@ export default class ExcellentHomePage extends Component {
         <div className="excellent-home-page-background" />
         <div className="excellent-home-page-content-wrapper">
           <div className="excellent-home-page-content">
-            <h2 className="title">新淘宝 新体验</h2>
+            <h2 className="title">
+              <Icon type="process" size="xxxl"/>&nbsp;星链缘 新体验
+            </h2>
             <p className="subtitle">
-              新的开放能力赋能商家、ISV，使用手机淘宝帮助用户获得更出色的使用体验
+              新的区块链技术能力赋能，帮助用户获得更出色的社交体验，在星云链上找到同年同月同日生的有缘人
             </p>
             <div
               className="excellent-home-page-buttons"
               style={{ textAlign: 'center', marginTop: 70 }}
             >
-              <a href="/framework/">
+              <a href="/#/Create/">
                 <Button
                   style={{
                     height: 50,
@@ -46,7 +48,7 @@ export default class ExcellentHomePage extends Component {
                   type="primary"
                   size="large"
                 >
-                  快速上手
+                    开始使用
                   <div
                     style={{
                       marginLeft: '5px',

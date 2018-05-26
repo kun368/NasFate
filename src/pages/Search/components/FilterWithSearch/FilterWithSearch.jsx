@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import IceContainer from '@icedesign/container';
-import { Search, Grid, Tab } from '@icedesign/base';
+import { Search, Grid, Tab, Button, Icon } from '@icedesign/base';
 import './FilterWithSearch.scss';
 import moment from 'moment';
-import { DatePicker, Input, Select, Button, Feedback } from '@icedesign/base';
+import { DatePicker, Input, Select, Feedback } from '@icedesign/base';
 import NebUtils from '../../../../util/NebUtils.js';
 import { Base64 } from 'js-base64';
 
@@ -22,6 +22,7 @@ export default class FilterWithSearch extends Component {
     this.state = {
       inputDate: null,
       pageTitle: null,
+      extLink: null,
       dataSource: [],
     };
   }
@@ -32,37 +33,31 @@ export default class FilterWithSearch extends Component {
 
   onSearchDate() {
     if (this.state.inputDate) {
-      const str = moment(this.state.inputDate)
-        .format('YYYYMMDD');
+      const str = moment(this.state.inputDate).format('YYYYMMDD');
       this.doUpdateTable(str);
     }
   }
 
+  formatExtLink = (day) => {
+    const str = moment(day, 'YYYYMMDD').format("M/D");
+    return `http://www.todayonhistory.com/${str}/`
+  };
+
   doUpdateTable = (day) => {
-    if (!NebUtils.checkInstalledPlugin()) {
-      Toast.error('还未安装Chrome扩展，请点击页面上方的下载按钮！');
-      return;
-    }
     const contract = {
       function: 'querySameDay',
       args: `[${day}]`,
     };
     Toast.success('查询中，请稍等...');
-    NebUtils.pluginSimCall(
-      contract.function,
-      contract.args,
-      (err) => {
-        Toast.error('获取数据失败: ' + err);
-      },
-      (item) => {
-        console.log(item);
-        this.setState({
-          pageTitle: `星链缘人-${day}（${item.length}个）`,
-          dataSource: item,
-        });
-        Toast.success('获取数据成功！');
-      },
-    );
+    NebUtils.userCallAxios(contract.function, contract.args, (item) => {
+      console.log(item);
+      this.setState({
+        pageTitle: `星链缘人-${day}（${item.length}个）`,
+        dataSource: item,
+        extLink: this.formatExtLink(day),
+      });
+      Toast.success('获取数据成功！');
+    });
   };
 
   renderItem = (item, idx) => {
@@ -99,9 +94,19 @@ export default class FilterWithSearch extends Component {
       return (
         <IceContainer>
           <div>
-            <h2 style={styles.title}>{this.state.pageTitle}</h2>
+            <h2 style={styles.title}>
+              {this.state.pageTitle}
+              &nbsp;&nbsp;
+              <Button type="normal"
+                      size="small"
+                      component="a"
+                      href={this.state.extLink}
+                      target="_blank">
+                历史上的今天<Icon type="skip"/>
+              </Button>
+            </h2>
             <div style={styles.noticeList}>
-              {this.state.dataSource.length === 0 ? '暂无数据' :
+              {this.state.dataSource.length === 0 ? '' :
                 this.state.dataSource.map((item, idx) => {
                   return this.renderItem(item, idx);
                 })}
