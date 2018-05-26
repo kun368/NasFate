@@ -113,7 +113,7 @@ export default class SettingsForm extends Component {
                 </Col>
                 <Col s="12" l="10">
                   <IceFormBinder name="comment">
-                    <Input size="large" multiple placeholder="请输入想说的话..." rows={8} />
+                    <Input size="large" multiple placeholder="请输入想说的话：生日、祝福、许愿、留言..." rows={8} />
                   </IceFormBinder>
                   <IceFormError name="comment" />
                 </Col>
